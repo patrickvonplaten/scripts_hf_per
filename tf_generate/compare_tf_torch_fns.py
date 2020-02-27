@@ -69,12 +69,13 @@ def tf_top_k_top_p_filtering(
             Make sure we keep at least min_tokens_to_keep per batch example in the output
         From: https://gist.github.com/thomwolf/1a5a29f6962089e871b94cbd09daf317
     """
+    logits_shape = logits.shape
+
     if top_k > 0:
-        top_k = min(max(top_k, min_tokens_to_keep), logits.shape[-1])  # Safety check
+        top_k = min(max(top_k, min_tokens_to_keep), logits_shape[-1])  # Safety check
         # Remove all tokens with a probability less than the last token of the top-k
         indices_to_remove = logits < tf.math.top_k(logits, k=top_k)[0][..., -1, None]
-        filter_value_logits = tf.Variable(tf.zeros_like(logits) + filter_value)
-        logits = tf.where(indices_to_remove, filter_value_logits, logits)
+        logits = set_tensor_by_indices_to_value(logits, indices_to_remove, filter_value)
 
     if top_p < 1.0:
         sorted_indices = tf.argsort(logits, direction="DESCENDING")
@@ -88,6 +89,7 @@ def tf_top_k_top_p_filtering(
 
         # Remove tokens with cumulative probability above the threshold (token with 0 are kept)
         sorted_indices_to_remove = cumulative_probs > top_p
+
         if min_tokens_to_keep > 1:
             # Keep at least min_tokens_to_keep (set to min_tokens_to_keep-1 because we add the first one below)
             sorted_indices_to_remove = tf.concat(
@@ -97,6 +99,7 @@ def tf_top_k_top_p_filtering(
                 ],
                 -1,
             )
+
         # Shift the indices to the right to keep also the first token above the threshold
         sorted_indices_to_remove = tf.roll(sorted_indices_to_remove, 1, axis=-1)
         sorted_indices_to_remove = tf.concat(
@@ -107,34 +110,39 @@ def tf_top_k_top_p_filtering(
             -1,
         )
         # scatter sorted tensors to original indexing
-        batch_dim_indices_flat = tf.reshape(
-            tf.broadcast_to(
-                tf.expand_dims(tf.range(sorted_indices_to_remove.shape[0]), axis=-1),
-                sorted_indices_to_remove.shape,
-            ),
-            [1, -1],
-        )
-        pair_sorted_indices_flat = tf.transpose(
-            tf.concat([batch_dim_indices_flat, tf.reshape(sorted_indices, [1, -1])], 0)
-        )
-        indices_to_remove = tf.scatter_nd(
-            pair_sorted_indices_flat,
-            tf.reshape(sorted_indices_to_remove, [-1]),
-            sorted_indices_to_remove.shape,
-        )
-        filter_value_logits = tf.Variable(tf.zeros_like(logits) + filter_value)
-        logits = tf.where(indices_to_remove, filter_value_logits, logits)
+        indices_to_remove = scatter_values_on_batch_indices(sorted_indices_to_remove, sorted_indices)
+        logits = set_tensor_by_indices_to_value(logits, indices_to_remove, filter_value)
     return logits
 
 
-np_tensor = get_tensor_from_torch(
-    "/home/patrick/hugging_face/scripts_per/tf_generate/logit_vector_sample.pt"
-)[0]
-np_tensor = np.tile(np_tensor, [2, 1])
+def scatter_values_on_batch_indices(values, batch_indices):
+    shape = batch_indices.shape
+    # broadcast batch dim to shape
+    broad_casted_batch_dims = tf.reshape(
+        tf.broadcast_to(tf.expand_dims(tf.range(shape[0]), axis=-1), shape), [1, -1]
+    )
+    # transform batch_indices to pair_indices
+    pair_indices = tf.transpose(
+        tf.concat([broad_casted_batch_dims, tf.reshape(batch_indices, [1, -1])], 0)
+    )
+    # scatter values to pair indices
+    return tf.scatter_nd(pair_indices, tf.reshape(values, [-1]), shape)
+
+
+def set_tensor_by_indices_to_value(tensor, indices, value):
+    # create value_tensor since tensor value assignment is not possible in TF
+    value_tensor = tf.zeros_like(tensor) + value
+    return tf.where(indices, value_tensor, tensor)
+
+
+def get_random_numpy_array(shape, upper_limit=0, lower_limit=-50):
+    return (upper_limit - lower_limit) * np.random.random(shape) + lower_limit
+
+
+np_tensor = get_random_numpy_array([5, 5000])
 tf_tensor = to_tf(np_tensor)
 pt_tensor = to_pt(np.copy(np_tensor))
 
-ipdb.set_trace()
 out_pt = top_k_top_p_filtering(
     pt_tensor, top_k=50, top_p=0.7, min_tokens_to_keep=70
 ).numpy()
@@ -143,5 +151,3 @@ out_tf = tf_top_k_top_p_filtering(
 ).numpy()
 
 assert np.allclose(out_pt, out_tf)
-
-print("yes")
