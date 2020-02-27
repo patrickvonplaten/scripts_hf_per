@@ -53,6 +53,7 @@ def top_k_top_p_filtering(
         indices_to_remove = sorted_indices_to_remove.scatter(
             1, sorted_indices, sorted_indices_to_remove
         )
+        return indices_to_remove
         logits[indices_to_remove] = filter_value
     return logits
 
@@ -107,40 +108,29 @@ def tf_top_k_top_p_filtering(
             -1,
         )
         # scatter sorted tensors to original indexing
-        batch_dim_indices_flat = tf.reshape(
-            tf.broadcast_to(
-                tf.expand_dims(tf.range(sorted_indices_to_remove.shape[0]), axis=-1),
-                sorted_indices_to_remove.shape,
-            ),
-            [1, -1],
-        )
-        pair_sorted_indices_flat = tf.transpose(
-            tf.concat([batch_dim_indices_flat, tf.reshape(sorted_indices, [1, -1])], 0)
-        )
-        indices_to_remove = tf.scatter_nd(
-            pair_sorted_indices_flat,
-            tf.reshape(sorted_indices_to_remove, [-1]),
-            sorted_indices_to_remove.shape,
-        )
-        filter_value_logits = tf.Variable(tf.zeros_like(logits) + filter_value)
-        logits = tf.where(indices_to_remove, filter_value_logits, logits)
+        batch_dim_indices = tf.reshape(tf.broadcast_to(tf.expand_dims(tf.range(sorted_indices_to_remove.shape[0]), axis=-1), sorted_indices_to_remove.shape), [1,-1])
+        sorted_indices = tf.transpose(tf.concat([batch_dim_indices, sorted_indices], 0))
+        ipdb.set_trace()
+        indices_to_remove = 
+        tf.scatter_nd(sorted_indices, tf.reshape(sorted_indices_to_remove, [-1]), sorted_indices_to_remove.shape
+        )  # expects logits to be of dim (batch_size, vocab_size)
+        return indices_to_remove
+#        filter_value_logits = tf.Variable(tf.zeros_like(logits) + filter_value)
+#        logits = tf.where(indices_to_remove, filter_value_logits, logits)
     return logits
 
 
 np_tensor = get_tensor_from_torch(
     "/home/patrick/hugging_face/scripts_per/tf_generate/logit_vector_sample.pt"
-)[0]
-np_tensor = np.tile(np_tensor, [2, 1])
+)
 tf_tensor = to_tf(np_tensor)
 pt_tensor = to_pt(np.copy(np_tensor))
 
-ipdb.set_trace()
-out_pt = top_k_top_p_filtering(
-    pt_tensor, top_k=50, top_p=0.7, min_tokens_to_keep=70
-).numpy()
-out_tf = tf_top_k_top_p_filtering(
-    tf_tensor, top_k=50, top_p=0.7, min_tokens_to_keep=70
-).numpy()
+# out_pt = top_k_top_p_filtering(pt_tensor).numpy()
+# out_tf = tf_top_k_top_p_filtering(tf_tensor).numpy()
+
+out_pt = top_k_top_p_filtering(pt_tensor[0], top_k=50, top_p=0.7).numpy()
+out_tf = tf_top_k_top_p_filtering(tf_tensor[0], top_k=50, top_p=0.7).numpy()
 
 assert np.allclose(out_pt, out_tf)
 
