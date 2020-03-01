@@ -2,7 +2,7 @@
 
 from transformers.tokenization_gpt2 import GPT2Tokenizer
 from transformers.modeling_gpt2 import GPT2LMHeadModel
-import ipdb
+import torch
 
 tokenizer = GPT2Tokenizer.from_pretrained('gpt2', pad_token='<|endoftext|>')
 model = GPT2LMHeadModel.from_pretrained('gpt2')
@@ -20,8 +20,7 @@ docs_next_tensors = tokenizer.batch_encode_plus(
 _, past = model(docs_tensors['input_ids'], attention_mask=docs_tensors['attention_mask'])
 
 # predicting the rest of the phrase
-#logits, _ = model(docs_next_tensors['input_ids'], attention_mask=docs_next_tensors['attention_mask'], past=past)
-ipdb.set_trace()
-logits, _ = model(docs_next_tensors['input_ids'], past=past)
+attn_mask = torch.cat([docs_tensors['attention_mask'], docs_next_tensors['attention_mask']], dim=-1)
+logits, _ = model(docs_next_tensors['input_ids'], attention_mask=attn_mask, past=past)
 logits = logits[:, -1]
 _, top_indices_results = logits.topk(30)
