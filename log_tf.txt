@@ -1,9 +1,0 @@
-Text: The dog is cute
-BOS: 50256
-PAD: None
-EOS: 50256
-Input tokens: [[  464  3290   318 13779]]
-Output tokens: [[  464  3290   318 13779   290 13779    11   475   673   338   407   257
-   3290    13  1375   338   257  3290    13   198]]
-Output text: The dog is cute and cute, but she's not a dog. She's a dog.
-
