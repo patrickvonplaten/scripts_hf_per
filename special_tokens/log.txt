@@ -1,0 +1,6 @@
+PAD not equal for bert-base-dutch-cased!
+TOK: 3 | CONF: 0
+BOS not equal for distilbert-base-cased!
+TOK: None | CONF: 0
+BOS not equal for distilbert-base-cased-distilled-squad!
+TOK: None | CONF: 0
