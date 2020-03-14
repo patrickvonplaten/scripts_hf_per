@@ -4,7 +4,7 @@ import random  # noqa: F401
 import numpy as np  # noqa: F401
 import torch
 from argparse import ArgumentParser  # noqa: F401
-from transformers import AutoModelWithLMHead, AutoTokenizer
+from transformers import TFAutoModelWithLMHead, AutoTokenizer, AutoModelWithLMHead
 
 
 def main(args):
@@ -24,7 +24,13 @@ with people, even a bishop, begging for his blessing. """
 
 
 def run_generation(args):
-    model = AutoModelWithLMHead.from_pretrained(args.model)
+    if args.lib == 'pt':
+        model = AutoModelWithLMHead.from_pretrained(args.model)
+    elif args.lib == 'tf':
+        model = TFAutoModelWithLMHead.from_pretrained(args.model)
+    else:
+        raise ValueError('{} is no lib'.format(args.lib))
+
     tokenizer = AutoTokenizer.from_pretrained(args.model)
 
     if args.input:
@@ -33,9 +39,7 @@ def run_generation(args):
         input_text = TEXT
 
     print("Text: {}".format(input_text))
-    tokenized_input_words = (
-        torch.tensor(tokenizer.encode(input_text, add_special_tokens=False)).unsqueeze(0)
-    )
+    tokenized_input_words = tokenizer.encode(input_text, add_special_tokens=False, return_tensors=args.lib)
     print("BOS: {}".format(tokenizer.bos_token_id))
     print("PAD: {}".format(tokenizer.pad_token_id))
     print("EOS: {}".format(tokenizer.eos_token_id))
@@ -45,11 +49,16 @@ def run_generation(args):
         tokenized_input_words,
         bos_token_id=tokenizer.bos_token_id,
         eos_token_ids=tokenizer.eos_token_id,
-        pad_token_id=tokenizer.pad_token_id
+        pad_token_id=tokenizer.pad_token_id,
+        do_sample=False,
+        no_repeat_ngram_size=2,
+        max_length=40,
+        num_beams=5,
+        early_stopping=True
     )
     print("Output tokens: {}".format(generated_tokens))
 
-    generated_words = tokenizer.decode(generated_tokens[0].tolist(), skip_special_tokens=True, clean_up_tokenization_spaces=True)
+    generated_words = tokenizer.decode(generated_tokens[0], skip_special_tokens=True, clean_up_tokenization_spaces=True)
     print("Output text: {}".format(generated_words))
 
 
@@ -57,5 +66,6 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--model", type=str, default="")
     parser.add_argument("--input", type=str, default="")
+    parser.add_argument("--lib", type=str, default="pt")
     args = parser.parse_args()
     main(args)
