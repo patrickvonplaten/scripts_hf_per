@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
-
-from transformers import TFLogUniformSampler, LogUniformSampler
+from transformers import TFTransfoXLLMHeadModel, TransfoXLLMHeadModel
 import torch
 import tensorflow as tf
 
-vocab_size = 10
-num_sample = 3
-labels = [1, 2]
 
-samp_tf = TFLogUniformSampler(vocab_size, num_sample)
-samp_pt = LogUniformSampler(vocab_size, num_sample)
+#tf_model = TFTransfoXLLMHeadModel.from_pretrained('transfo-xl-wt103', sample_softmax=3)
+model = TransfoXLLMHeadModel.from_pretrained('transfo-xl-wt103', sample_softmax=3)
 
-print(samp_pt.sample(torch.tensor(labels)))
-print(samp_tf.sample(tf.convert_to_tensor(labels)))
+tf_input = tf.convert_to_tensor([[0, 1]])
+pt_input = torch.tensor([[0, 1]])
+
+pt_output = model(pt_input, training=True)
+#tf_output = tf_model(tf_input, training=True)
