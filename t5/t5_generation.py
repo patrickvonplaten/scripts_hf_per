@@ -6,13 +6,13 @@ library = sys.argv[1]
 input_text = sys.argv[2]
 
 if library == 'pt':
-    model = T5ForConditionalGeneration.from_pretrained('t5-base')
+    model = T5ForConditionalGeneration.from_pretrained('t5-large')
 elif library == 'tf':
-    model = TFT5ForConditionalGeneration.from_pretrained('t5-base')
+    model = TFT5ForConditionalGeneration.from_pretrained('t5-large')
 else:
     raise ValueError('{} does not exist. Use either "tf" or "pt"'.format(library))
 
-tok = T5Tokenizer.from_pretrained('t5-base')
+tok = T5Tokenizer.from_pretrained('t5-large')
 
 input_ids = tok.encode(input_text, return_tensors=library)
 
