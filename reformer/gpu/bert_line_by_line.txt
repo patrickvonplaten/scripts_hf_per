@@ -1,0 +1,606 @@
+Running with arguments Namespace(amp=False, average_over=30, batch_sizes=[1, 8], bert=True, csv_filename='results/results_1586173923.csv', csv_memory_filename='memory/memory_1586173923.csv', fp16=False, keras_predict=False, models=['gpt2', 'bert-base-cased', 'xlnet-base-cased', 'xlm-mlm-en-2048', 'transfo-xl-wt103', 'openai-gpt', 'distilbert-base-uncased', 'distilgpt2', 'roberta-base', 'ctrl'], no_memory=False, no_reformer=True, no_speed=False, num_hashes=2, save_to_csv=True, slice_sizes=[1024, 2048, 4096, 8192], tensorflow=False, torch=True, torch_cuda=True, torchscript=False, verbose=True, xla=False)
+1 / 1
+
+Lines by line memory consumption:
+/home/patrick/python_bin/transformers/modeling_bert.py:368: mem 0.000B:         self_attention_outputs = self.attention(hidden_states, attention_mask, head_mask)
+/home/patrick/python_bin/transformers/modeling_bert.py:313: mem 0.000B:         self_outputs = self.self(
+/home/patrick/python_bin/transformers/modeling_bert.py:314: mem 0.000B:             hidden_states, attention_mask, head_mask, encoder_hidden_states, encoder_attention_mask
+/home/patrick/python_bin/transformers/modeling_bert.py:216: mem 0.000B:         mixed_query_layer = self.query(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:221: mem 0.000B:         if encoder_hidden_states is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:226: mem 0.000B:             mixed_key_layer = self.key(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:227: mem 0.000B:             mixed_value_layer = self.value(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:229: mem 0.000B:         query_layer = self.transpose_for_scores(mixed_query_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:230: mem 0.000B:         key_layer = self.transpose_for_scores(mixed_key_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:231: mem 0.000B:         value_layer = self.transpose_for_scores(mixed_value_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:234: mem 20.000MB:         attention_scores = torch.matmul(query_layer, key_layer.transpose(-1, -2))
+/home/patrick/python_bin/transformers/modeling_bert.py:235: mem 0.000B:         attention_scores = attention_scores / math.sqrt(self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:236: mem 0.000B:         if attention_mask is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:241: mem 0.000B:         attention_probs = nn.Softmax(dim=-1)(attention_scores)
+/home/patrick/python_bin/transformers/modeling_bert.py:245: mem 0.000B:         attention_probs = self.dropout(attention_probs)
+/home/patrick/python_bin/transformers/modeling_bert.py:248: mem 0.000B:         if head_mask is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:251: mem 2.000MB:         context_layer = torch.matmul(attention_probs, value_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:253: mem 0.000B:         context_layer = context_layer.permute(0, 2, 1, 3).contiguous()
+/home/patrick/python_bin/transformers/modeling_bert.py:254: mem 0.000B:         new_context_layer_shape = context_layer.size()[:-2] + (self.all_head_size,)
+/home/patrick/python_bin/transformers/modeling_bert.py:255: mem 0.000B:         context_layer = context_layer.view(*new_context_layer_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:257: mem 0.000B:         outputs = (context_layer, attention_probs) if self.output_attentions else (context_layer,)
+/home/patrick/python_bin/transformers/modeling_bert.py:258: mem 0.000B:         return outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:316: mem 0.000B:         attention_output = self.output(self_outputs[0], hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:269: mem 0.000B:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:270: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:271: mem 0.000B:         hidden_states = self.LayerNorm(hidden_states + input_tensor)
+/home/patrick/python_bin/transformers/modeling_bert.py:272: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:317: mem 0.000B:         outputs = (attention_output,) + self_outputs[1:]  # add attentions if we output them
+/home/patrick/python_bin/transformers/modeling_bert.py:318: mem 0.000B:         return outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:369: mem 0.000B:         attention_output = self_attention_outputs[0]
+/home/patrick/python_bin/transformers/modeling_bert.py:370: mem 0.000B:         outputs = self_attention_outputs[1:]  # add self attentions if we output attention weights
+/home/patrick/python_bin/transformers/modeling_bert.py:372: mem 0.000B:         if self.is_decoder and encoder_hidden_states is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:379: mem 0.000B:         intermediate_output = self.intermediate(attention_output)
+/home/patrick/python_bin/transformers/modeling_bert.py:331: mem 0.000B:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:332: mem 0.000B:         hidden_states = self.intermediate_act_fn(hidden_states)
+/home/patrick/python_bin/transformers/activations.py:18: mem 2.000MB:     return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
+/home/patrick/python_bin/transformers/modeling_bert.py:333: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:380: mem 0.000B:         layer_output = self.output(intermediate_output, attention_output)
+/home/patrick/python_bin/transformers/modeling_bert.py:344: mem 0.000B:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:345: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:346: mem 0.000B:         hidden_states = self.LayerNorm(hidden_states + input_tensor)
+/home/patrick/python_bin/transformers/modeling_bert.py:347: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:381: mem 0.000B:         outputs = (layer_output,) + outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:382: mem -24.000MB:         return outputs
+
+Lines with top memory consumption:
+=> /home/patrick/python_bin/transformers/modeling_bert.py:234: mem 20.000MB:         attention_scores = torch.matmul(query_layer, key_layer.transpose(-1, -2))
+=> /home/patrick/python_bin/transformers/modeling_bert.py:251: mem 2.000MB:         context_layer = torch.matmul(attention_probs, value_layer)
+=> /home/patrick/python_bin/transformers/activations.py:18: mem 2.000MB:     return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
+=> /home/patrick/python_bin/transformers/modeling_bert.py:368: mem 0.000B:         self_attention_outputs = self.attention(hidden_states, attention_mask, head_mask)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:313: mem 0.000B:         self_outputs = self.self(
+=> /home/patrick/python_bin/transformers/modeling_bert.py:314: mem 0.000B:             hidden_states, attention_mask, head_mask, encoder_hidden_states, encoder_attention_mask
+
+Lines with lowest memory consumption:
+=> /home/patrick/python_bin/transformers/modeling_bert.py:344: mem 0.000B:         hidden_states = self.dense(hidden_states)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:345: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:346: mem 0.000B:         hidden_states = self.LayerNorm(hidden_states + input_tensor)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:347: mem 0.000B:         return hidden_states
+=> /home/patrick/python_bin/transformers/modeling_bert.py:381: mem 0.000B:         outputs = (layer_output,) + outputs
+=> /home/patrick/python_bin/transformers/modeling_bert.py:382: mem -24.000MB:         return outputs
+
+Total memory increase: 24.000MB
+Going through model with sequence of shape torch.Size([1, 1024, 64])
+
+Lines by line memory consumption:
+/home/patrick/python_bin/transformers/modeling_bert.py:368: mem 0.000B:         self_attention_outputs = self.attention(hidden_states, attention_mask, head_mask)
+/home/patrick/python_bin/transformers/modeling_bert.py:313: mem 0.000B:         self_outputs = self.self(
+/home/patrick/python_bin/transformers/modeling_bert.py:314: mem 0.000B:             hidden_states, attention_mask, head_mask, encoder_hidden_states, encoder_attention_mask
+/home/patrick/python_bin/transformers/modeling_bert.py:216: mem 0.000B:         mixed_query_layer = self.query(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:221: mem 0.000B:         if encoder_hidden_states is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:226: mem 2.000MB:             mixed_key_layer = self.key(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:227: mem 0.000B:             mixed_value_layer = self.value(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:229: mem 0.000B:         query_layer = self.transpose_for_scores(mixed_query_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:230: mem 0.000B:         key_layer = self.transpose_for_scores(mixed_key_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:231: mem 0.000B:         value_layer = self.transpose_for_scores(mixed_value_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:234: mem 32.000MB:         attention_scores = torch.matmul(query_layer, key_layer.transpose(-1, -2))
+/home/patrick/python_bin/transformers/modeling_bert.py:235: mem 0.000B:         attention_scores = attention_scores / math.sqrt(self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:236: mem 0.000B:         if attention_mask is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:241: mem 32.000MB:         attention_probs = nn.Softmax(dim=-1)(attention_scores)
+/home/patrick/python_bin/transformers/modeling_bert.py:245: mem 0.000B:         attention_probs = self.dropout(attention_probs)
+/home/patrick/python_bin/transformers/modeling_bert.py:248: mem 0.000B:         if head_mask is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:251: mem 2.000MB:         context_layer = torch.matmul(attention_probs, value_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:253: mem 0.000B:         context_layer = context_layer.permute(0, 2, 1, 3).contiguous()
+/home/patrick/python_bin/transformers/modeling_bert.py:254: mem 0.000B:         new_context_layer_shape = context_layer.size()[:-2] + (self.all_head_size,)
+/home/patrick/python_bin/transformers/modeling_bert.py:255: mem 0.000B:         context_layer = context_layer.view(*new_context_layer_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:257: mem 0.000B:         outputs = (context_layer, attention_probs) if self.output_attentions else (context_layer,)
+/home/patrick/python_bin/transformers/modeling_bert.py:258: mem 0.000B:         return outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:316: mem 0.000B:         attention_output = self.output(self_outputs[0], hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:269: mem 0.000B:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:270: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:271: mem 0.000B:         hidden_states = self.LayerNorm(hidden_states + input_tensor)
+/home/patrick/python_bin/transformers/modeling_bert.py:272: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:317: mem 0.000B:         outputs = (attention_output,) + self_outputs[1:]  # add attentions if we output them
+/home/patrick/python_bin/transformers/modeling_bert.py:318: mem 0.000B:         return outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:369: mem 0.000B:         attention_output = self_attention_outputs[0]
+/home/patrick/python_bin/transformers/modeling_bert.py:370: mem 0.000B:         outputs = self_attention_outputs[1:]  # add self attentions if we output attention weights
+/home/patrick/python_bin/transformers/modeling_bert.py:372: mem 0.000B:         if self.is_decoder and encoder_hidden_states is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:379: mem 0.000B:         intermediate_output = self.intermediate(attention_output)
+/home/patrick/python_bin/transformers/modeling_bert.py:331: mem 0.000B:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:332: mem 0.000B:         hidden_states = self.intermediate_act_fn(hidden_states)
+/home/patrick/python_bin/transformers/activations.py:18: mem 4.000MB:     return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
+/home/patrick/python_bin/transformers/modeling_bert.py:333: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:380: mem 0.000B:         layer_output = self.output(intermediate_output, attention_output)
+/home/patrick/python_bin/transformers/modeling_bert.py:344: mem 0.000B:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:345: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:346: mem 0.000B:         hidden_states = self.LayerNorm(hidden_states + input_tensor)
+/home/patrick/python_bin/transformers/modeling_bert.py:347: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:381: mem 0.000B:         outputs = (layer_output,) + outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:382: mem -72.000MB:         return outputs
+
+Lines with top memory consumption:
+=> /home/patrick/python_bin/transformers/modeling_bert.py:234: mem 32.000MB:         attention_scores = torch.matmul(query_layer, key_layer.transpose(-1, -2))
+=> /home/patrick/python_bin/transformers/modeling_bert.py:241: mem 32.000MB:         attention_probs = nn.Softmax(dim=-1)(attention_scores)
+=> /home/patrick/python_bin/transformers/activations.py:18: mem 4.000MB:     return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
+=> /home/patrick/python_bin/transformers/modeling_bert.py:226: mem 2.000MB:             mixed_key_layer = self.key(hidden_states)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:251: mem 2.000MB:         context_layer = torch.matmul(attention_probs, value_layer)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:368: mem 0.000B:         self_attention_outputs = self.attention(hidden_states, attention_mask, head_mask)
+
+Lines with lowest memory consumption:
+=> /home/patrick/python_bin/transformers/modeling_bert.py:344: mem 0.000B:         hidden_states = self.dense(hidden_states)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:345: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:346: mem 0.000B:         hidden_states = self.LayerNorm(hidden_states + input_tensor)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:347: mem 0.000B:         return hidden_states
+=> /home/patrick/python_bin/transformers/modeling_bert.py:381: mem 0.000B:         outputs = (layer_output,) + outputs
+=> /home/patrick/python_bin/transformers/modeling_bert.py:382: mem -72.000MB:         return outputs
+
+Total memory increase: 72.000MB
+Going through model with sequence of shape torch.Size([1, 2048, 64])
+
+Lines by line memory consumption:
+/home/patrick/python_bin/transformers/modeling_bert.py:368: mem 0.000B:         self_attention_outputs = self.attention(hidden_states, attention_mask, head_mask)
+/home/patrick/python_bin/transformers/modeling_bert.py:313: mem 0.000B:         self_outputs = self.self(
+/home/patrick/python_bin/transformers/modeling_bert.py:314: mem 0.000B:             hidden_states, attention_mask, head_mask, encoder_hidden_states, encoder_attention_mask
+/home/patrick/python_bin/transformers/modeling_bert.py:216: mem 0.000B:         mixed_query_layer = self.query(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:221: mem 0.000B:         if encoder_hidden_states is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:226: mem 0.000B:             mixed_key_layer = self.key(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:227: mem 2.000MB:             mixed_value_layer = self.value(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:229: mem 0.000B:         query_layer = self.transpose_for_scores(mixed_query_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:230: mem 0.000B:         key_layer = self.transpose_for_scores(mixed_key_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:231: mem 0.000B:         value_layer = self.transpose_for_scores(mixed_value_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:234: mem 130.000MB:         attention_scores = torch.matmul(query_layer, key_layer.transpose(-1, -2))
+/home/patrick/python_bin/transformers/modeling_bert.py:235: mem 0.000B:         attention_scores = attention_scores / math.sqrt(self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:236: mem 0.000B:         if attention_mask is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:241: mem 128.000MB:         attention_probs = nn.Softmax(dim=-1)(attention_scores)
+/home/patrick/python_bin/transformers/modeling_bert.py:245: mem 0.000B:         attention_probs = self.dropout(attention_probs)
+/home/patrick/python_bin/transformers/modeling_bert.py:248: mem 0.000B:         if head_mask is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:251: mem 2.000MB:         context_layer = torch.matmul(attention_probs, value_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:253: mem 0.000B:         context_layer = context_layer.permute(0, 2, 1, 3).contiguous()
+/home/patrick/python_bin/transformers/modeling_bert.py:254: mem 0.000B:         new_context_layer_shape = context_layer.size()[:-2] + (self.all_head_size,)
+/home/patrick/python_bin/transformers/modeling_bert.py:255: mem 0.000B:         context_layer = context_layer.view(*new_context_layer_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:257: mem 0.000B:         outputs = (context_layer, attention_probs) if self.output_attentions else (context_layer,)
+/home/patrick/python_bin/transformers/modeling_bert.py:258: mem 0.000B:         return outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:316: mem 0.000B:         attention_output = self.output(self_outputs[0], hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:269: mem 0.000B:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:270: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:271: mem 0.000B:         hidden_states = self.LayerNorm(hidden_states + input_tensor)
+/home/patrick/python_bin/transformers/modeling_bert.py:272: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:317: mem 0.000B:         outputs = (attention_output,) + self_outputs[1:]  # add attentions if we output them
+/home/patrick/python_bin/transformers/modeling_bert.py:318: mem 0.000B:         return outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:369: mem 0.000B:         attention_output = self_attention_outputs[0]
+/home/patrick/python_bin/transformers/modeling_bert.py:370: mem 0.000B:         outputs = self_attention_outputs[1:]  # add self attentions if we output attention weights
+/home/patrick/python_bin/transformers/modeling_bert.py:372: mem 0.000B:         if self.is_decoder and encoder_hidden_states is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:379: mem 0.000B:         intermediate_output = self.intermediate(attention_output)
+/home/patrick/python_bin/transformers/modeling_bert.py:331: mem 20.000MB:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:332: mem 0.000B:         hidden_states = self.intermediate_act_fn(hidden_states)
+/home/patrick/python_bin/transformers/activations.py:18: mem 0.000B:     return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
+/home/patrick/python_bin/transformers/modeling_bert.py:333: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:380: mem 0.000B:         layer_output = self.output(intermediate_output, attention_output)
+/home/patrick/python_bin/transformers/modeling_bert.py:344: mem 0.000B:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:345: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:346: mem 2.000MB:         hidden_states = self.LayerNorm(hidden_states + input_tensor)
+/home/patrick/python_bin/transformers/modeling_bert.py:347: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:381: mem 0.000B:         outputs = (layer_output,) + outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:382: mem -284.000MB:         return outputs
+
+Lines with top memory consumption:
+=> /home/patrick/python_bin/transformers/modeling_bert.py:234: mem 130.000MB:         attention_scores = torch.matmul(query_layer, key_layer.transpose(-1, -2))
+=> /home/patrick/python_bin/transformers/modeling_bert.py:241: mem 128.000MB:         attention_probs = nn.Softmax(dim=-1)(attention_scores)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:331: mem 20.000MB:         hidden_states = self.dense(hidden_states)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:227: mem 2.000MB:             mixed_value_layer = self.value(hidden_states)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:251: mem 2.000MB:         context_layer = torch.matmul(attention_probs, value_layer)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:346: mem 2.000MB:         hidden_states = self.LayerNorm(hidden_states + input_tensor)
+
+Lines with lowest memory consumption:
+=> /home/patrick/python_bin/transformers/modeling_bert.py:380: mem 0.000B:         layer_output = self.output(intermediate_output, attention_output)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:344: mem 0.000B:         hidden_states = self.dense(hidden_states)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:345: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:347: mem 0.000B:         return hidden_states
+=> /home/patrick/python_bin/transformers/modeling_bert.py:381: mem 0.000B:         outputs = (layer_output,) + outputs
+=> /home/patrick/python_bin/transformers/modeling_bert.py:382: mem -284.000MB:         return outputs
+
+Total memory increase: 284.000MB
+Going through model with sequence of shape torch.Size([1, 4096, 64])
+
+Lines by line memory consumption:
+/home/patrick/python_bin/transformers/modeling_bert.py:368: mem 0.000B:         self_attention_outputs = self.attention(hidden_states, attention_mask, head_mask)
+/home/patrick/python_bin/transformers/modeling_bert.py:313: mem 0.000B:         self_outputs = self.self(
+/home/patrick/python_bin/transformers/modeling_bert.py:314: mem 0.000B:             hidden_states, attention_mask, head_mask, encoder_hidden_states, encoder_attention_mask
+/home/patrick/python_bin/transformers/modeling_bert.py:216: mem 0.000B:         mixed_query_layer = self.query(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:221: mem 0.000B:         if encoder_hidden_states is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:226: mem 0.000B:             mixed_key_layer = self.key(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:227: mem 0.000B:             mixed_value_layer = self.value(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:229: mem 0.000B:         query_layer = self.transpose_for_scores(mixed_query_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:230: mem 0.000B:         key_layer = self.transpose_for_scores(mixed_key_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:231: mem 0.000B:         value_layer = self.transpose_for_scores(mixed_value_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:234: mem 512.000MB:         attention_scores = torch.matmul(query_layer, key_layer.transpose(-1, -2))
+/home/patrick/python_bin/transformers/modeling_bert.py:235: mem 0.000B:         attention_scores = attention_scores / math.sqrt(self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:236: mem 0.000B:         if attention_mask is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:241: mem 512.000MB:         attention_probs = nn.Softmax(dim=-1)(attention_scores)
+/home/patrick/python_bin/transformers/modeling_bert.py:245: mem 0.000B:         attention_probs = self.dropout(attention_probs)
+/home/patrick/python_bin/transformers/modeling_bert.py:248: mem 0.000B:         if head_mask is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:251: mem 0.000B:         context_layer = torch.matmul(attention_probs, value_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:253: mem 0.000B:         context_layer = context_layer.permute(0, 2, 1, 3).contiguous()
+/home/patrick/python_bin/transformers/modeling_bert.py:254: mem 0.000B:         new_context_layer_shape = context_layer.size()[:-2] + (self.all_head_size,)
+/home/patrick/python_bin/transformers/modeling_bert.py:255: mem 0.000B:         context_layer = context_layer.view(*new_context_layer_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:257: mem 0.000B:         outputs = (context_layer, attention_probs) if self.output_attentions else (context_layer,)
+/home/patrick/python_bin/transformers/modeling_bert.py:258: mem 0.000B:         return outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:316: mem 0.000B:         attention_output = self.output(self_outputs[0], hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:269: mem 0.000B:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:270: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:271: mem 0.000B:         hidden_states = self.LayerNorm(hidden_states + input_tensor)
+/home/patrick/python_bin/transformers/modeling_bert.py:272: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:317: mem 0.000B:         outputs = (attention_output,) + self_outputs[1:]  # add attentions if we output them
+/home/patrick/python_bin/transformers/modeling_bert.py:318: mem 0.000B:         return outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:369: mem 0.000B:         attention_output = self_attention_outputs[0]
+/home/patrick/python_bin/transformers/modeling_bert.py:370: mem 0.000B:         outputs = self_attention_outputs[1:]  # add self attentions if we output attention weights
+/home/patrick/python_bin/transformers/modeling_bert.py:372: mem 0.000B:         if self.is_decoder and encoder_hidden_states is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:379: mem 0.000B:         intermediate_output = self.intermediate(attention_output)
+/home/patrick/python_bin/transformers/modeling_bert.py:331: mem 0.000B:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:332: mem 0.000B:         hidden_states = self.intermediate_act_fn(hidden_states)
+/home/patrick/python_bin/transformers/activations.py:18: mem 20.000MB:     return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
+/home/patrick/python_bin/transformers/modeling_bert.py:333: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:380: mem 0.000B:         layer_output = self.output(intermediate_output, attention_output)
+/home/patrick/python_bin/transformers/modeling_bert.py:344: mem 0.000B:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:345: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:346: mem 0.000B:         hidden_states = self.LayerNorm(hidden_states + input_tensor)
+/home/patrick/python_bin/transformers/modeling_bert.py:347: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:381: mem 0.000B:         outputs = (layer_output,) + outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:382: mem -1.020GB:         return outputs
+
+Lines with top memory consumption:
+=> /home/patrick/python_bin/transformers/modeling_bert.py:234: mem 512.000MB:         attention_scores = torch.matmul(query_layer, key_layer.transpose(-1, -2))
+=> /home/patrick/python_bin/transformers/modeling_bert.py:241: mem 512.000MB:         attention_probs = nn.Softmax(dim=-1)(attention_scores)
+=> /home/patrick/python_bin/transformers/activations.py:18: mem 20.000MB:     return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
+=> /home/patrick/python_bin/transformers/modeling_bert.py:368: mem 0.000B:         self_attention_outputs = self.attention(hidden_states, attention_mask, head_mask)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:313: mem 0.000B:         self_outputs = self.self(
+=> /home/patrick/python_bin/transformers/modeling_bert.py:314: mem 0.000B:             hidden_states, attention_mask, head_mask, encoder_hidden_states, encoder_attention_mask
+
+Lines with lowest memory consumption:
+=> /home/patrick/python_bin/transformers/modeling_bert.py:344: mem 0.000B:         hidden_states = self.dense(hidden_states)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:345: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:346: mem 0.000B:         hidden_states = self.LayerNorm(hidden_states + input_tensor)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:347: mem 0.000B:         return hidden_states
+=> /home/patrick/python_bin/transformers/modeling_bert.py:381: mem 0.000B:         outputs = (layer_output,) + outputs
+=> /home/patrick/python_bin/transformers/modeling_bert.py:382: mem -1.020GB:         return outputs
+
+Total memory increase: 1.020GB
+Going through model with sequence of shape torch.Size([1, 8192, 64])
+
+Lines by line memory consumption:
+/home/patrick/python_bin/transformers/modeling_bert.py:368: mem 0.000B:         self_attention_outputs = self.attention(hidden_states, attention_mask, head_mask)
+/home/patrick/python_bin/transformers/modeling_bert.py:313: mem 0.000B:         self_outputs = self.self(
+/home/patrick/python_bin/transformers/modeling_bert.py:314: mem 0.000B:             hidden_states, attention_mask, head_mask, encoder_hidden_states, encoder_attention_mask
+/home/patrick/python_bin/transformers/modeling_bert.py:216: mem 0.000B:         mixed_query_layer = self.query(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:221: mem 0.000B:         if encoder_hidden_states is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:226: mem 0.000B:             mixed_key_layer = self.key(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:227: mem 0.000B:             mixed_value_layer = self.value(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:229: mem 0.000B:         query_layer = self.transpose_for_scores(mixed_query_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:230: mem 0.000B:         key_layer = self.transpose_for_scores(mixed_key_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:231: mem 0.000B:         value_layer = self.transpose_for_scores(mixed_value_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:234: mem 64.000MB:         attention_scores = torch.matmul(query_layer, key_layer.transpose(-1, -2))
+/home/patrick/python_bin/transformers/modeling_bert.py:235: mem 0.000B:         attention_scores = attention_scores / math.sqrt(self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:236: mem 0.000B:         if attention_mask is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:241: mem 64.000MB:         attention_probs = nn.Softmax(dim=-1)(attention_scores)
+/home/patrick/python_bin/transformers/modeling_bert.py:245: mem 0.000B:         attention_probs = self.dropout(attention_probs)
+/home/patrick/python_bin/transformers/modeling_bert.py:248: mem 0.000B:         if head_mask is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:251: mem 0.000B:         context_layer = torch.matmul(attention_probs, value_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:253: mem 0.000B:         context_layer = context_layer.permute(0, 2, 1, 3).contiguous()
+/home/patrick/python_bin/transformers/modeling_bert.py:254: mem 0.000B:         new_context_layer_shape = context_layer.size()[:-2] + (self.all_head_size,)
+/home/patrick/python_bin/transformers/modeling_bert.py:255: mem 0.000B:         context_layer = context_layer.view(*new_context_layer_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:257: mem 0.000B:         outputs = (context_layer, attention_probs) if self.output_attentions else (context_layer,)
+/home/patrick/python_bin/transformers/modeling_bert.py:258: mem 0.000B:         return outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:316: mem 0.000B:         attention_output = self.output(self_outputs[0], hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:269: mem 0.000B:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:270: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:271: mem 0.000B:         hidden_states = self.LayerNorm(hidden_states + input_tensor)
+/home/patrick/python_bin/transformers/modeling_bert.py:272: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:317: mem 0.000B:         outputs = (attention_output,) + self_outputs[1:]  # add attentions if we output them
+/home/patrick/python_bin/transformers/modeling_bert.py:318: mem 0.000B:         return outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:369: mem 0.000B:         attention_output = self_attention_outputs[0]
+/home/patrick/python_bin/transformers/modeling_bert.py:370: mem 0.000B:         outputs = self_attention_outputs[1:]  # add self attentions if we output attention weights
+/home/patrick/python_bin/transformers/modeling_bert.py:372: mem 0.000B:         if self.is_decoder and encoder_hidden_states is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:379: mem 0.000B:         intermediate_output = self.intermediate(attention_output)
+/home/patrick/python_bin/transformers/modeling_bert.py:331: mem 0.000B:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:332: mem 0.000B:         hidden_states = self.intermediate_act_fn(hidden_states)
+/home/patrick/python_bin/transformers/activations.py:18: mem 20.000MB:     return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
+/home/patrick/python_bin/transformers/modeling_bert.py:333: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:380: mem 0.000B:         layer_output = self.output(intermediate_output, attention_output)
+/home/patrick/python_bin/transformers/modeling_bert.py:344: mem 0.000B:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:345: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:346: mem 0.000B:         hidden_states = self.LayerNorm(hidden_states + input_tensor)
+/home/patrick/python_bin/transformers/modeling_bert.py:347: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:381: mem 0.000B:         outputs = (layer_output,) + outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:382: mem -148.000MB:         return outputs
+
+Lines with top memory consumption:
+=> /home/patrick/python_bin/transformers/modeling_bert.py:234: mem 64.000MB:         attention_scores = torch.matmul(query_layer, key_layer.transpose(-1, -2))
+=> /home/patrick/python_bin/transformers/modeling_bert.py:241: mem 64.000MB:         attention_probs = nn.Softmax(dim=-1)(attention_scores)
+=> /home/patrick/python_bin/transformers/activations.py:18: mem 20.000MB:     return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
+=> /home/patrick/python_bin/transformers/modeling_bert.py:368: mem 0.000B:         self_attention_outputs = self.attention(hidden_states, attention_mask, head_mask)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:313: mem 0.000B:         self_outputs = self.self(
+=> /home/patrick/python_bin/transformers/modeling_bert.py:314: mem 0.000B:             hidden_states, attention_mask, head_mask, encoder_hidden_states, encoder_attention_mask
+
+Lines with lowest memory consumption:
+=> /home/patrick/python_bin/transformers/modeling_bert.py:344: mem 0.000B:         hidden_states = self.dense(hidden_states)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:345: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:346: mem 0.000B:         hidden_states = self.LayerNorm(hidden_states + input_tensor)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:347: mem 0.000B:         return hidden_states
+=> /home/patrick/python_bin/transformers/modeling_bert.py:381: mem 0.000B:         outputs = (layer_output,) + outputs
+=> /home/patrick/python_bin/transformers/modeling_bert.py:382: mem -148.000MB:         return outputs
+
+Total memory increase: 148.000MB
+Going through model with sequence of shape torch.Size([8, 1024, 64])
+
+Lines by line memory consumption:
+/home/patrick/python_bin/transformers/modeling_bert.py:368: mem 0.000B:         self_attention_outputs = self.attention(hidden_states, attention_mask, head_mask)
+/home/patrick/python_bin/transformers/modeling_bert.py:313: mem 0.000B:         self_outputs = self.self(
+/home/patrick/python_bin/transformers/modeling_bert.py:314: mem 0.000B:             hidden_states, attention_mask, head_mask, encoder_hidden_states, encoder_attention_mask
+/home/patrick/python_bin/transformers/modeling_bert.py:216: mem 0.000B:         mixed_query_layer = self.query(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:221: mem 0.000B:         if encoder_hidden_states is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:226: mem 0.000B:             mixed_key_layer = self.key(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:227: mem 0.000B:             mixed_value_layer = self.value(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:229: mem 0.000B:         query_layer = self.transpose_for_scores(mixed_query_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:230: mem 0.000B:         key_layer = self.transpose_for_scores(mixed_key_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:231: mem 0.000B:         value_layer = self.transpose_for_scores(mixed_value_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:234: mem 276.000MB:         attention_scores = torch.matmul(query_layer, key_layer.transpose(-1, -2))
+/home/patrick/python_bin/transformers/modeling_bert.py:235: mem 0.000B:         attention_scores = attention_scores / math.sqrt(self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:236: mem 0.000B:         if attention_mask is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:241: mem 256.000MB:         attention_probs = nn.Softmax(dim=-1)(attention_scores)
+/home/patrick/python_bin/transformers/modeling_bert.py:245: mem 0.000B:         attention_probs = self.dropout(attention_probs)
+/home/patrick/python_bin/transformers/modeling_bert.py:248: mem 0.000B:         if head_mask is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:251: mem 0.000B:         context_layer = torch.matmul(attention_probs, value_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:253: mem 0.000B:         context_layer = context_layer.permute(0, 2, 1, 3).contiguous()
+/home/patrick/python_bin/transformers/modeling_bert.py:254: mem 0.000B:         new_context_layer_shape = context_layer.size()[:-2] + (self.all_head_size,)
+/home/patrick/python_bin/transformers/modeling_bert.py:255: mem 0.000B:         context_layer = context_layer.view(*new_context_layer_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:257: mem 0.000B:         outputs = (context_layer, attention_probs) if self.output_attentions else (context_layer,)
+/home/patrick/python_bin/transformers/modeling_bert.py:258: mem 0.000B:         return outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:316: mem 0.000B:         attention_output = self.output(self_outputs[0], hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:269: mem 0.000B:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:270: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:271: mem 0.000B:         hidden_states = self.LayerNorm(hidden_states + input_tensor)
+/home/patrick/python_bin/transformers/modeling_bert.py:272: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:317: mem 0.000B:         outputs = (attention_output,) + self_outputs[1:]  # add attentions if we output them
+/home/patrick/python_bin/transformers/modeling_bert.py:318: mem 0.000B:         return outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:369: mem 0.000B:         attention_output = self_attention_outputs[0]
+/home/patrick/python_bin/transformers/modeling_bert.py:370: mem 0.000B:         outputs = self_attention_outputs[1:]  # add self attentions if we output attention weights
+/home/patrick/python_bin/transformers/modeling_bert.py:372: mem 0.000B:         if self.is_decoder and encoder_hidden_states is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:379: mem 0.000B:         intermediate_output = self.intermediate(attention_output)
+/home/patrick/python_bin/transformers/modeling_bert.py:331: mem 20.000MB:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:332: mem 0.000B:         hidden_states = self.intermediate_act_fn(hidden_states)
+/home/patrick/python_bin/transformers/activations.py:18: mem 40.000MB:     return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
+/home/patrick/python_bin/transformers/modeling_bert.py:333: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:380: mem 0.000B:         layer_output = self.output(intermediate_output, attention_output)
+/home/patrick/python_bin/transformers/modeling_bert.py:344: mem 0.000B:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:345: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:346: mem 0.000B:         hidden_states = self.LayerNorm(hidden_states + input_tensor)
+/home/patrick/python_bin/transformers/modeling_bert.py:347: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:381: mem 0.000B:         outputs = (layer_output,) + outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:382: mem -592.000MB:         return outputs
+
+Lines with top memory consumption:
+=> /home/patrick/python_bin/transformers/modeling_bert.py:234: mem 276.000MB:         attention_scores = torch.matmul(query_layer, key_layer.transpose(-1, -2))
+=> /home/patrick/python_bin/transformers/modeling_bert.py:241: mem 256.000MB:         attention_probs = nn.Softmax(dim=-1)(attention_scores)
+=> /home/patrick/python_bin/transformers/activations.py:18: mem 40.000MB:     return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
+=> /home/patrick/python_bin/transformers/modeling_bert.py:331: mem 20.000MB:         hidden_states = self.dense(hidden_states)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:368: mem 0.000B:         self_attention_outputs = self.attention(hidden_states, attention_mask, head_mask)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:313: mem 0.000B:         self_outputs = self.self(
+
+Lines with lowest memory consumption:
+=> /home/patrick/python_bin/transformers/modeling_bert.py:344: mem 0.000B:         hidden_states = self.dense(hidden_states)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:345: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:346: mem 0.000B:         hidden_states = self.LayerNorm(hidden_states + input_tensor)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:347: mem 0.000B:         return hidden_states
+=> /home/patrick/python_bin/transformers/modeling_bert.py:381: mem 0.000B:         outputs = (layer_output,) + outputs
+=> /home/patrick/python_bin/transformers/modeling_bert.py:382: mem -592.000MB:         return outputs
+
+Total memory increase: 592.000MB
+Going through model with sequence of shape torch.Size([8, 2048, 64])
+
+Lines by line memory consumption:
+/home/patrick/python_bin/transformers/modeling_bert.py:368: mem 0.000B:         self_attention_outputs = self.attention(hidden_states, attention_mask, head_mask)
+/home/patrick/python_bin/transformers/modeling_bert.py:313: mem 0.000B:         self_outputs = self.self(
+/home/patrick/python_bin/transformers/modeling_bert.py:314: mem 0.000B:             hidden_states, attention_mask, head_mask, encoder_hidden_states, encoder_attention_mask
+/home/patrick/python_bin/transformers/modeling_bert.py:216: mem 20.000MB:         mixed_query_layer = self.query(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:221: mem 0.000B:         if encoder_hidden_states is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:226: mem 0.000B:             mixed_key_layer = self.key(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:227: mem 20.000MB:             mixed_value_layer = self.value(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:229: mem 0.000B:         query_layer = self.transpose_for_scores(mixed_query_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:230: mem 0.000B:         key_layer = self.transpose_for_scores(mixed_key_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:231: mem 0.000B:         value_layer = self.transpose_for_scores(mixed_value_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:234: mem 1.020GB:         attention_scores = torch.matmul(query_layer, key_layer.transpose(-1, -2))
+/home/patrick/python_bin/transformers/modeling_bert.py:235: mem 0.000B:         attention_scores = attention_scores / math.sqrt(self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:236: mem 0.000B:         if attention_mask is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:241: mem 1.000GB:         attention_probs = nn.Softmax(dim=-1)(attention_scores)
+/home/patrick/python_bin/transformers/modeling_bert.py:245: mem 0.000B:         attention_probs = self.dropout(attention_probs)
+/home/patrick/python_bin/transformers/modeling_bert.py:248: mem 0.000B:         if head_mask is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:251: mem 20.000MB:         context_layer = torch.matmul(attention_probs, value_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:253: mem 0.000B:         context_layer = context_layer.permute(0, 2, 1, 3).contiguous()
+/home/patrick/python_bin/transformers/modeling_bert.py:254: mem 0.000B:         new_context_layer_shape = context_layer.size()[:-2] + (self.all_head_size,)
+/home/patrick/python_bin/transformers/modeling_bert.py:255: mem 0.000B:         context_layer = context_layer.view(*new_context_layer_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:257: mem 0.000B:         outputs = (context_layer, attention_probs) if self.output_attentions else (context_layer,)
+/home/patrick/python_bin/transformers/modeling_bert.py:258: mem -20.000MB:         return outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:316: mem 0.000B:         attention_output = self.output(self_outputs[0], hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:269: mem 0.000B:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:270: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:271: mem 20.000MB:         hidden_states = self.LayerNorm(hidden_states + input_tensor)
+/home/patrick/python_bin/transformers/modeling_bert.py:272: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:317: mem 0.000B:         outputs = (attention_output,) + self_outputs[1:]  # add attentions if we output them
+/home/patrick/python_bin/transformers/modeling_bert.py:318: mem 0.000B:         return outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:369: mem 0.000B:         attention_output = self_attention_outputs[0]
+/home/patrick/python_bin/transformers/modeling_bert.py:370: mem 0.000B:         outputs = self_attention_outputs[1:]  # add self attentions if we output attention weights
+/home/patrick/python_bin/transformers/modeling_bert.py:372: mem 0.000B:         if self.is_decoder and encoder_hidden_states is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:379: mem 0.000B:         intermediate_output = self.intermediate(attention_output)
+/home/patrick/python_bin/transformers/modeling_bert.py:331: mem 16.000MB:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:332: mem 0.000B:         hidden_states = self.intermediate_act_fn(hidden_states)
+/home/patrick/python_bin/transformers/activations.py:18: mem 48.000MB:     return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
+/home/patrick/python_bin/transformers/modeling_bert.py:333: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:380: mem 0.000B:         layer_output = self.output(intermediate_output, attention_output)
+/home/patrick/python_bin/transformers/modeling_bert.py:344: mem 0.000B:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:345: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:346: mem 20.000MB:         hidden_states = self.LayerNorm(hidden_states + input_tensor)
+/home/patrick/python_bin/transformers/modeling_bert.py:347: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:381: mem 0.000B:         outputs = (layer_output,) + outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:382: mem -2.160GB:         return outputs
+
+Lines with top memory consumption:
+=> /home/patrick/python_bin/transformers/modeling_bert.py:234: mem 1.020GB:         attention_scores = torch.matmul(query_layer, key_layer.transpose(-1, -2))
+=> /home/patrick/python_bin/transformers/modeling_bert.py:241: mem 1.000GB:         attention_probs = nn.Softmax(dim=-1)(attention_scores)
+=> /home/patrick/python_bin/transformers/activations.py:18: mem 48.000MB:     return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
+=> /home/patrick/python_bin/transformers/modeling_bert.py:216: mem 20.000MB:         mixed_query_layer = self.query(hidden_states)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:227: mem 20.000MB:             mixed_value_layer = self.value(hidden_states)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:251: mem 20.000MB:         context_layer = torch.matmul(attention_probs, value_layer)
+
+Lines with lowest memory consumption:
+=> /home/patrick/python_bin/transformers/modeling_bert.py:344: mem 0.000B:         hidden_states = self.dense(hidden_states)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:345: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:347: mem 0.000B:         return hidden_states
+=> /home/patrick/python_bin/transformers/modeling_bert.py:381: mem 0.000B:         outputs = (layer_output,) + outputs
+=> /home/patrick/python_bin/transformers/modeling_bert.py:258: mem -20.000MB:         return outputs
+=> /home/patrick/python_bin/transformers/modeling_bert.py:382: mem -2.160GB:         return outputs
+
+Total memory increase: 2.180GB
+Going through model with sequence of shape torch.Size([8, 4096, 64])
+
+Lines by line memory consumption:
+/home/patrick/python_bin/transformers/modeling_bert.py:368: mem 0.000B:         self_attention_outputs = self.attention(hidden_states, attention_mask, head_mask)
+/home/patrick/python_bin/transformers/modeling_bert.py:313: mem 0.000B:         self_outputs = self.self(
+/home/patrick/python_bin/transformers/modeling_bert.py:314: mem 0.000B:             hidden_states, attention_mask, head_mask, encoder_hidden_states, encoder_attention_mask
+/home/patrick/python_bin/transformers/modeling_bert.py:216: mem 16.000MB:         mixed_query_layer = self.query(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:221: mem 0.000B:         if encoder_hidden_states is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:226: mem 16.000MB:             mixed_key_layer = self.key(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:227: mem 16.000MB:             mixed_value_layer = self.value(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:229: mem 0.000B:         query_layer = self.transpose_for_scores(mixed_query_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:230: mem 0.000B:         key_layer = self.transpose_for_scores(mixed_key_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:231: mem 0.000B:         value_layer = self.transpose_for_scores(mixed_value_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:204: mem 0.000B:         new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:205: mem 0.000B:         x = x.view(*new_x_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:206: mem 0.000B:         return x.permute(0, 2, 1, 3)
+/home/patrick/python_bin/transformers/modeling_bert.py:234: mem 4.031GB:         attention_scores = torch.matmul(query_layer, key_layer.transpose(-1, -2))
+/home/patrick/python_bin/transformers/modeling_bert.py:235: mem 0.000B:         attention_scores = attention_scores / math.sqrt(self.attention_head_size)
+/home/patrick/python_bin/transformers/modeling_bert.py:236: mem 0.000B:         if attention_mask is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:241: mem 4.000GB:         attention_probs = nn.Softmax(dim=-1)(attention_scores)
+/home/patrick/python_bin/transformers/modeling_bert.py:245: mem 0.000B:         attention_probs = self.dropout(attention_probs)
+/home/patrick/python_bin/transformers/modeling_bert.py:248: mem 0.000B:         if head_mask is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:251: mem 32.000MB:         context_layer = torch.matmul(attention_probs, value_layer)
+/home/patrick/python_bin/transformers/modeling_bert.py:253: mem 0.000B:         context_layer = context_layer.permute(0, 2, 1, 3).contiguous()
+/home/patrick/python_bin/transformers/modeling_bert.py:254: mem 0.000B:         new_context_layer_shape = context_layer.size()[:-2] + (self.all_head_size,)
+/home/patrick/python_bin/transformers/modeling_bert.py:255: mem 0.000B:         context_layer = context_layer.view(*new_context_layer_shape)
+/home/patrick/python_bin/transformers/modeling_bert.py:257: mem 0.000B:         outputs = (context_layer, attention_probs) if self.output_attentions else (context_layer,)
+/home/patrick/python_bin/transformers/modeling_bert.py:258: mem -48.000MB:         return outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:316: mem 0.000B:         attention_output = self.output(self_outputs[0], hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:269: mem 16.000MB:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:270: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:271: mem 16.000MB:         hidden_states = self.LayerNorm(hidden_states + input_tensor)
+/home/patrick/python_bin/transformers/modeling_bert.py:272: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:317: mem 0.000B:         outputs = (attention_output,) + self_outputs[1:]  # add attentions if we output them
+/home/patrick/python_bin/transformers/modeling_bert.py:318: mem 0.000B:         return outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:369: mem 0.000B:         attention_output = self_attention_outputs[0]
+/home/patrick/python_bin/transformers/modeling_bert.py:370: mem 0.000B:         outputs = self_attention_outputs[1:]  # add self attentions if we output attention weights
+/home/patrick/python_bin/transformers/modeling_bert.py:372: mem 0.000B:         if self.is_decoder and encoder_hidden_states is not None:
+/home/patrick/python_bin/transformers/modeling_bert.py:379: mem 0.000B:         intermediate_output = self.intermediate(attention_output)
+/home/patrick/python_bin/transformers/modeling_bert.py:331: mem 32.000MB:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:332: mem 0.000B:         hidden_states = self.intermediate_act_fn(hidden_states)
+/home/patrick/python_bin/transformers/activations.py:18: mem 96.000MB:     return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
+/home/patrick/python_bin/transformers/modeling_bert.py:333: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:380: mem 0.000B:         layer_output = self.output(intermediate_output, attention_output)
+/home/patrick/python_bin/transformers/modeling_bert.py:344: mem 16.000MB:         hidden_states = self.dense(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:345: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+/home/patrick/python_bin/transformers/modeling_bert.py:346: mem 16.000MB:         hidden_states = self.LayerNorm(hidden_states + input_tensor)
+/home/patrick/python_bin/transformers/modeling_bert.py:347: mem 0.000B:         return hidden_states
+/home/patrick/python_bin/transformers/modeling_bert.py:381: mem 0.000B:         outputs = (layer_output,) + outputs
+/home/patrick/python_bin/transformers/modeling_bert.py:382: mem -8.250GB:         return outputs
+
+Lines with top memory consumption:
+=> /home/patrick/python_bin/transformers/modeling_bert.py:234: mem 4.031GB:         attention_scores = torch.matmul(query_layer, key_layer.transpose(-1, -2))
+=> /home/patrick/python_bin/transformers/modeling_bert.py:241: mem 4.000GB:         attention_probs = nn.Softmax(dim=-1)(attention_scores)
+=> /home/patrick/python_bin/transformers/activations.py:18: mem 96.000MB:     return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
+=> /home/patrick/python_bin/transformers/modeling_bert.py:251: mem 32.000MB:         context_layer = torch.matmul(attention_probs, value_layer)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:331: mem 32.000MB:         hidden_states = self.dense(hidden_states)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:216: mem 16.000MB:         mixed_query_layer = self.query(hidden_states)
+
+Lines with lowest memory consumption:
+=> /home/patrick/python_bin/transformers/modeling_bert.py:380: mem 0.000B:         layer_output = self.output(intermediate_output, attention_output)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:345: mem 0.000B:         hidden_states = self.dropout(hidden_states)
+=> /home/patrick/python_bin/transformers/modeling_bert.py:347: mem 0.000B:         return hidden_states
+=> /home/patrick/python_bin/transformers/modeling_bert.py:381: mem 0.000B:         outputs = (layer_output,) + outputs
+=> /home/patrick/python_bin/transformers/modeling_bert.py:258: mem -48.000MB:         return outputs
+=> /home/patrick/python_bin/transformers/modeling_bert.py:382: mem -8.250GB:         return outputs
+
+Total memory increase: 8.297GB
+Going through model with sequence of shape torch.Size([8, 8192, 64])
+=========== RESULTS ===========
+	======= MODEL CHECKPOINT: BertLayer =======
+		===== BATCH SIZE: 1 =====
+		BertLayer/1/1024: 0.001s 24.000MB
+		BertLayer/1/2048: 0.001s 72.000MB
+		BertLayer/1/4096: 0.002s 284.000MB
+		BertLayer/1/8192: 0.005s 1.020GB
+		===== BATCH SIZE: 8 =====
+		BertLayer/8/1024: 0.001s 148.000MB
+		BertLayer/8/2048: 0.003s 592.000MB
+		BertLayer/8/4096: 0.01s 2.180GB
+		BertLayer/8/8192: 0.044s 8.297GB
