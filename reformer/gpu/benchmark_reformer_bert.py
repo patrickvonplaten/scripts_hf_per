@@ -501,7 +501,7 @@ def _compute_pytorch(
                 else:
                     sequence = (
                         hidden_states[0, :slice_size, :]
-                        .to(device=device)
+                        .to(device)
                         .repeat(batch_size, 1, 1)
                     )
                     try:
