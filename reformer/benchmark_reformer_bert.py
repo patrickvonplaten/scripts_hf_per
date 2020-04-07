@@ -467,6 +467,9 @@ def _compute_pytorch(
             for slice_size in slice_sizes:
 
                 num_buckets = int(2 * slice_size / chunk_length)
+                if num_buckets > chunk_length:
+                    factorized_num_buckets = num_buckets // 32
+                    num_buckets = [32, factorized_num_buckets]
 
                 bert_config = BertConfig(
                     hidden_size=hidden_size,
