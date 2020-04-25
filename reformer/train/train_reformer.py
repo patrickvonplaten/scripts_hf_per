@@ -31,7 +31,7 @@ def create_reformer_config():
         "num_buckets": [64, 128],
         "num_hashes": 1,
         "vocab_size": 320,
-        "attention_probs_dropout_prob": 0.1,
+        "attention_probs_dropout_prob": 0.05,
         "hidden_dropout_prob": 0.05,
         "seed": None  # that parameter is only needed for testing and will be removed soon
     })
@@ -40,16 +40,17 @@ def create_reformer_config():
 def get_training_args():
     # define the training args
     return TrainingArguments(**{
-        "learning_rate": 5e-4,
+        "learning_rate": 5e-6,
         "warmup_steps": 50,
-        "adam_epsilon": 1e-9,
-        "num_train_epochs": 600,
-        "output_dir": "./runs",
+        "weight_decay": 0.0,
+        "adam_epsilon": 1e-8,
+        "num_train_epochs": 4000,
+        "gradient_accumulation_steps": 8,
+        "output_dir": "./runs_3",
         "do_train": True,
         "do_eval": True,
-        "do_predict": True,
-        "logging_steps": 10,
-        "save_steps": 100,
+        "logging_steps": 24,
+        "save_steps": 800,
     })
 
 
@@ -105,6 +106,12 @@ class ReformerCollator(DataCollator):
         }
 
 
+def calculate_metrics(pred):
+    arg_max = torch.argmax(pred.predictions, dim=-1)
+    acc = (arg_max == pred.label_ids).float().mean().item()
+    return {"accuracy": acc}
+
+
 def main():
     # let's use > 0.5M samples per sample
     padded_sequence_length = 2 ** 19
@@ -127,17 +134,14 @@ def main():
     # create training params
     training_args = get_training_args()
 
-    import ipdb
-    ipdb.set_trace()
-
     # create the trainer
     trainer = Trainer(
         model=model,
         args=training_args,
+        metrics=calculate_metrics,
         data_collator=data_collator,
         train_dataset=dataset,
         eval_dataset=dataset,
-        prediction_loss_only=True,
     )
 
     # train
