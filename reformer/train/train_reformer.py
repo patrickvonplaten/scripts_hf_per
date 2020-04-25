@@ -11,6 +11,10 @@ import nlp
 import torch
 
 
+import logging
+logging.basicConfig(level=logging.INFO)
+
+
 def create_reformer_config():
     # define config of reformer model
     return ReformerConfig(**{
@@ -40,16 +44,12 @@ def create_reformer_config():
 def get_training_args():
     # define the training args
     return TrainingArguments(**{
-        "learning_rate": 5e-6,
-        "warmup_steps": 50,
-        "weight_decay": 0.0,
-        "adam_epsilon": 1e-8,
         "num_train_epochs": 4000,
-        "gradient_accumulation_steps": 8,
-        "output_dir": "./runs_3",
+        "output_dir": "./output",
+        "logging_dir": "./log",
         "do_train": True,
         "do_eval": True,
-        "logging_steps": 24,
+        "logging_steps": 5,
         "save_steps": 800,
     })
 
@@ -62,10 +62,11 @@ def prepare_dataset(max_length):
 
     # define our map function to reduce the dataset to one sample
     def flatten_and_tokenize(batch):
-        all_input_text = ["".join(batch["paragraph"])]
+        all_input_text = ["".join(batch["line"])]
         input_ids_dict = tokenizer.batch_encode_plus(
             all_input_text, pad_to_max_length=True, max_length=max_length
         )
+
         return input_ids_dict
 
     # load the dataset
@@ -73,11 +74,12 @@ def prepare_dataset(max_length):
 
     # reduce the dataset
     dataset = dataset.map(
-        flatten_and_tokenize, batched=True, remove_columns=["paragraph"]
+        flatten_and_tokenize, batched=True, batch_size=-1, remove_columns=["line"]
     )
 
     # prepare dataset to be in torch format
     dataset.set_format(type="torch", columns=["input_ids", "attention_mask"])
+
     return dataset
 
 
@@ -98,15 +100,18 @@ class ReformerCollator(DataCollator):
             features[0]["attention_mask"], random_shift_length
         ).unsqueeze(0)
 
+        # set lm_labels = -100 for padded input
+        lm_labels = torch.where(rolled_attention_mask == 0, torch.tensor(-100), rolled_input_ids)
+
         # return dict
         return {
             "input_ids": rolled_input_ids,  # BS x SEQ_LEN
-            "lm_labels": rolled_input_ids,  # BS x SEQ_LEN
+            "lm_labels": lm_labels,  # BS x SEQ_LEN
             "attention_mask": rolled_attention_mask,  # BS x SEQ_LEN
         }
 
 
-def calculate_metrics(pred):
+def compute_metrics(pred):
     arg_max = torch.argmax(pred.predictions, dim=-1)
     acc = (arg_max == pred.label_ids).float().mean().item()
     return {"accuracy": acc}
@@ -138,7 +143,7 @@ def main():
     trainer = Trainer(
         model=model,
         args=training_args,
-        metrics=calculate_metrics,
+        compute_metrics=compute_metrics,
         data_collator=data_collator,
         train_dataset=dataset,
         eval_dataset=dataset,
