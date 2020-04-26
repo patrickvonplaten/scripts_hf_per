@@ -9,6 +9,7 @@ from transformers import (
 )
 import nlp
 import torch
+import numpy as np
 
 
 import logging
@@ -51,20 +52,22 @@ def get_training_args():
     return TrainingArguments(**{
         "learning_rate": 0.01,
         "max_steps": 10000,
-        "output_dir": "./output_1",
-        "logging_dir": "./log_1",
+        "output_dir": "./output_2",
+        "logging_dir": "./log_2",
         "do_train": True,
         "do_eval": True,
         "evaluate_during_training": True,
+        "gradient_accumulation_steps": 8,
         "logging_steps": 50,
         "scheduler": "cosine_decay_hard_restarts",
         "num_cycles_cosine_decay": 0.7,
-        "warmup_steps": 100,
+        "warmup_steps": 800,
         "weight_decay": 0.0,
         "adam_beta_1": 0.86,
         "adam_beta_2": 0.92,
-        "adam_eps": 1e-9,
-        "save_steps": 1000
+        "adam_epsilon": 1e-9,
+        "save_steps": 1000,
+        "overwrite_output_dir": True
     })
 
 
@@ -120,14 +123,14 @@ class ReformerCollator(DataCollator):
         # return dict
         return {
             "input_ids": rolled_input_ids,  # BS x SEQ_LEN
-            "lm_labels": lm_labels,  # BS x SEQ_LEN
+            "labels": lm_labels,  # BS x SEQ_LEN
             "attention_mask": rolled_attention_mask,  # BS x SEQ_LEN
         }
 
 
 def compute_metrics(pred):
-    arg_max = torch.argmax(pred.predictions, dim=-1)
-    acc = (arg_max == pred.label_ids).float().mean().item()
+    arg_max = np.argmax(pred.predictions, axis=-1)
+    acc = np.mean(np.asarray((arg_max == pred.label_ids), dtype=np.float))
     return {"accuracy": acc}
 
 
