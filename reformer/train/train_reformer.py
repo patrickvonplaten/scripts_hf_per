@@ -134,9 +134,13 @@ class ReformerCollator(DataCollator):
 
 
 def compute_metrics(pred):
-    non_padded_indices = (pred.label_ids != -100)
-    arg_max = np.argmax(pred.predictions[non_padded_indices], axis=-1)
-    acc = np.mean(np.asarray((arg_max == pred.label_ids[non_padded_indices]), dtype=np.float))
+    non_padded_indices = (pred.labels_ids != -100)
+
+    # correctly shift labels and pred as it's done in forward()
+    labels = pred.labels_ids[..., :-1][non_padded_indices]
+    pred = np.argmax(pred.predictions[..., 1:, ...], axis=-1)[non_padded_indices]
+
+    acc = np.mean(np.asarray(pred == labels), dtype=np.float)
     return {"accuracy": acc}
 
 
