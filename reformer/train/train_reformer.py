@@ -50,26 +50,26 @@ def create_reformer_config():
 def get_training_args():
     # define the training args
     return TrainingArguments(**{
-        "learning_rate": 0.01,
-        "max_steps": 10000,
-        "output_dir": "./output_2",
-        "logging_dir": "./log_2",
+        "learning_rate": 1e-3,
+        "max_steps": 4000,
+        "output_dir": "./output_3",
+        "logging_dir": "./log_3",
         "do_train": True,
         "do_eval": True,
         "evaluate_during_training": True,
         "gradient_accumulation_steps": 8,
         "logging_steps": 50,
         "scheduler": "cosine_decay_hard_restarts",
-        "num_cycles_cosine_decay": 0.7,
-        "warmup_steps": 800,
+        "num_cycles_cosine_decay": 0.75,
+        "warmup_steps": 600,
         "weight_decay": 0.0,
         "adam_beta_1": 0.86,
         "adam_beta_2": 0.92,
         "adam_epsilon": 1e-9,
-        "save_steps": 1000,
-        "overwrite_output_dir": True,
         "per_gpu_train_batch_size": 1,
         "per_gpu_eval_batch_size": 1,
+        "save_steps": 500,
+        "overwrite_output_dir": True
     })
 
 
@@ -134,8 +134,9 @@ class ReformerCollator(DataCollator):
 
 
 def compute_metrics(pred):
-    arg_max = np.argmax(pred.predictions, axis=-1)
-    acc = np.mean(np.asarray((arg_max == pred.label_ids), dtype=np.float))
+    non_padded_indices = (pred.label_ids != -100)
+    arg_max = np.argmax(pred.predictions[non_padded_indices], axis=-1)
+    acc = np.mean(np.asarray((arg_max == pred.label_ids[non_padded_indices]), dtype=np.float))
     return {"accuracy": acc}
 
 
