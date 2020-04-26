@@ -35,7 +35,12 @@ def create_reformer_config():
         "num_buckets": [64, 128],
         "num_hashes": 1,
         "vocab_size": 320,
-        "attention_probs_dropout_prob": 0.05,
+        "lsh_attention_probs_dropout_prob": 0.0,
+        "lsh_num_chunks_before": 1,
+        "lsh_num_chunks_after": 0,
+        "local_num_chunks_before": 1,
+        "local_num_chunks_after": 0,
+        "local_attention_probs_dropout_prob": 0.05,
         "hidden_dropout_prob": 0.05,
         "seed": None  # that parameter is only needed for testing and will be removed soon
     })
@@ -44,13 +49,22 @@ def create_reformer_config():
 def get_training_args():
     # define the training args
     return TrainingArguments(**{
-        "num_train_epochs": 4000,
-        "output_dir": "./output",
-        "logging_dir": "./log",
+        "learning_rate": 0.01,
+        "max_steps": 10000,
+        "output_dir": "./output_1",
+        "logging_dir": "./log_1",
         "do_train": True,
         "do_eval": True,
-        "logging_steps": 5,
-        "save_steps": 800,
+        "evaluate_during_training": True,
+        "logging_steps": 50,
+        "scheduler": "cosine_decay_hard_restarts",
+        "num_cycles_cosine_decay": 0.7,
+        "warmup_steps": 100,
+        "weight_decay": 0.0,
+        "adam_beta_1": 0.86,
+        "adam_beta_2": 0.92,
+        "adam_eps": 1e-9,
+        "save_steps": 1000
     })
 
 
