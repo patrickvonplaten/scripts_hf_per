@@ -67,7 +67,9 @@ def get_training_args():
         "adam_beta_2": 0.92,
         "adam_epsilon": 1e-9,
         "save_steps": 1000,
-        "overwrite_output_dir": True
+        "overwrite_output_dir": True,
+        "per_gpu_train_batch_size": 1,
+        "per_gpu_eval_batch_size": 1,
     })
 
 
@@ -81,9 +83,12 @@ def prepare_dataset(max_length):
     def flatten_and_tokenize(batch):
         all_input_text = ["".join(batch["line"])]
         input_ids_dict = tokenizer.batch_encode_plus(
-            all_input_text, pad_to_max_length=True, max_length=max_length
+            all_input_text, pad_to_max_length=True, max_length=max_length,
         )
 
+        # duplicate data 8 times to have have 8 examples in dataset
+        for key in input_ids_dict.keys():
+            input_ids_dict[key] = [8 * [x] for x in input_ids_dict[key]][0]
         return input_ids_dict
 
     # load the dataset
