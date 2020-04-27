@@ -49,28 +49,27 @@ def create_reformer_config():
 
 def get_training_args():
     # define the training args
-    return TrainingArguments(**{
-        "learning_rate": 1e-3,
-        "max_steps": 4000,
-        "output_dir": "./output_3",
-        "logging_dir": "./log_3",
+    training_args = {
+        "learning_rate": 1e-2,
+        "max_steps": 600,
         "do_train": True,
         "do_eval": True,
         "evaluate_during_training": True,
         "gradient_accumulation_steps": 8,
-        "logging_steps": 50,
+        "logging_steps": 10,
         "scheduler": "cosine_decay_hard_restarts",
-        "num_cycles_cosine_decay": 0.75,
-        "warmup_steps": 600,
+        "num_cycles_cosine_decay": 1.0,
+        "warmup_steps": 100,
         "weight_decay": 0.0,
         "adam_beta_1": 0.86,
         "adam_beta_2": 0.92,
         "adam_epsilon": 1e-9,
         "per_gpu_train_batch_size": 1,
         "per_gpu_eval_batch_size": 1,
-        "save_steps": 500,
-        "overwrite_output_dir": True
-    })
+        "save_steps": 50,
+    }
+    training_args['output_dir'] = "output_lr_{}_max_steps_{}".format(training_args['learning_rate'], training_args['max_steps'])
+    return TrainingArguments(**training_args)
 
 
 def prepare_dataset(max_length):
@@ -134,11 +133,11 @@ class ReformerCollator(DataCollator):
 
 
 def compute_metrics(pred):
-    non_padded_indices = (pred.labels_ids != -100)
+    non_padded_indices = (pred.label_ids != -100)
 
     # correctly shift labels and pred as it's done in forward()
-    labels = pred.labels_ids[..., :-1][non_padded_indices]
-    pred = np.argmax(pred.predictions[..., 1:, ...], axis=-1)[non_padded_indices]
+    labels = pred.label_ids[..., 1:][non_padded_indices[..., 1:]]
+    pred = np.argmax(pred.predictions[:, :-1], axis=-1)[non_padded_indices[..., :-1]]
 
     acc = np.mean(np.asarray(pred == labels), dtype=np.float)
     return {"accuracy": acc}
